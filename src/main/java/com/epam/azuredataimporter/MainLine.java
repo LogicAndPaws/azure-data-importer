@@ -4,6 +4,7 @@ import com.epam.azuredataimporter.azure.AzureConnector;
 import com.epam.azuredataimporter.dao.PostgresDAO;
 import com.epam.azuredataimporter.data.DataParser;
 import com.epam.azuredataimporter.data.DataValidator;
+import com.epam.azuredataimporter.entity.User;
 
 public class MainLine {
     private Reporter reporter;
@@ -11,6 +12,7 @@ public class MainLine {
     private PostgresDAO dao;
     private DataParser parser;
     private DataValidator validator;
+
     public MainLine(Reporter reporter,AzureConnector connector, PostgresDAO dao, DataParser parser, DataValidator validator){
         this.reporter = reporter;
         azureConnector = connector;
@@ -18,7 +20,8 @@ public class MainLine {
         this.parser = parser;
         this.validator = validator;
     }
-    public void startImport(String importConfigFile){
-
+    public void startImport(){
+        String trigger = azureConnector.getTrigger();
+        ImportConfig config = parser.parseTrigger(trigger);
     }
 }

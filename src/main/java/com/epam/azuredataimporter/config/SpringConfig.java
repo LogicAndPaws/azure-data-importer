@@ -29,12 +29,16 @@ public class SpringConfig {
     @Bean
     public PostgresDAO dao(ApplicationConfig config, ResultsObserver observer){
         return new PostgresDAO(observer,
-                config.getParameter("dbUrl"),
-                config.getParameter("dbUser"),
-                config.getParameter("dbPassword"));
+                config.getDbUrl(),
+                config.getDbUser(),
+                config.getDbPassword());
     }
     @Bean
     public AzureConnector connector(ApplicationConfig config, ResultsObserver observer){
-        return new AzureConnector(observer,config.getParameter("blobName"));
+        return new AzureConnector(observer,config.getBlobName(),config.getImportTrigger());
+    }
+    @Bean
+    public MainLine mainline(Reporter reporter,AzureConnector connector, PostgresDAO dao, DataParser parser, DataValidator validator){
+        return new MainLine(reporter, connector, dao, parser, validator);
     }
 }

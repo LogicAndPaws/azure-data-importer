@@ -15,18 +15,16 @@ public class AzureConnector {
     private final String storageConnectionString = "UseDevelopmentStorage=true;";
     private CloudBlobContainer container=null;
     private ResultsObserver observer;
-    public AzureConnector(ResultsObserver observer,String blobName){
+    private String triggerFilename;
+    public AzureConnector(ResultsObserver observer,String blobName,String triggerFilename){
         this.observer = observer;
+        this.triggerFilename = triggerFilename;
         try {
             CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
             CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
             container = blobClient.getContainerReference(blobName);
             container.createIfNotExists(BlobContainerPublicAccessType.CONTAINER, new BlobRequestOptions(), new OperationContext());
-        } catch (StorageException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
             e.printStackTrace();
         }
     }
@@ -57,11 +55,7 @@ public class AzureConnector {
             CloudBlockBlob blob = container.getBlockBlobReference(file.getName());
             blob.uploadFromFile(file.getAbsolutePath());
             return true;
-        } catch (StorageException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (StorageException | URISyntaxException | IOException e) {
             e.printStackTrace();
         }
         return false;
@@ -71,13 +65,18 @@ public class AzureConnector {
             CloudBlockBlob blob = container.getBlockBlobReference(filename);
             blob.uploadText(stringLine);
             return true;
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (StorageException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (URISyntaxException | StorageException | IOException e) {
             e.printStackTrace();
         }
         return false;
+    }
+    public String getTrigger(){
+        try {
+            CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
+            return blob.downloadText();
+        } catch (URISyntaxException | IOException | StorageException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
