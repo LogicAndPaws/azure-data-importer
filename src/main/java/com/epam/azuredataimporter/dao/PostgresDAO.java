@@ -15,9 +15,9 @@ import java.util.List;
 public class PostgresDAO {
     private JdbcTemplate template = null;
     private final static String driver = "org.postgresql.Driver";
-    private String url;
-    private String username;
-    private String password;
+//    private String url;
+//    private String username;
+//    private String password;
     private ResultsObserver observer;
 
     public PostgresDAO(ResultsObserver observer,String dbUrl,String dbUsername,String dbPassword){
@@ -54,7 +54,7 @@ public class PostgresDAO {
     }
     public void insertUser(User user){
         if(getUserById(user.getId())!=null){
-            observer.failed("User with id("+user.getId()+") already exist");
+            observer.failed("(DataBase) User with id("+user.getId()+") already exist");
             return;
         }
         template.update("INSERT INTO users values(?, ?, ?)",user.getId(),user.getName(),user.getPassword());

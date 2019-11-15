@@ -40,16 +40,22 @@ public class AzureConnector {
             return null;
         }
     }
-    public BufferedReader openReadStream(String filename){
-        try {
-            CloudBlockBlob blob = container.getBlockBlobReference(filename);
-            BlobInputStream blobInputStream = blob.openInputStream();
-            return new BufferedReader(new InputStreamReader(blobInputStream));
-        } catch (StorageException | URISyntaxException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    public BufferedReader openReadStream(String filename){
+//        try {
+//            CloudBlockBlob blob = container.getBlockBlobReference(filename);
+//            BlobInputStream blobInputStream = blob.openInputStream();
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(blobInputStream));
+//            System.out.println(reader.ready());
+//            System.out.println(reader.readLine());
+//            System.out.println(reader.readLine());
+//            return reader;
+////            return new BufferedReader(new InputStreamReader(blobInputStream));
+//        } catch (StorageException | URISyntaxException | IOException e) {
+//            e.printStackTrace();
+//            observer.failed("(Critical) Connection with Azure failed with cause:\n"+e.getMessage());
+//            return null;
+//        }
+//    }
     public boolean sendFile(File file){
         try{
             CloudBlockBlob blob = container.getBlockBlobReference(file.getName());
@@ -67,6 +73,7 @@ public class AzureConnector {
             return true;
         } catch (URISyntaxException | StorageException | IOException e) {
             e.printStackTrace();
+            observer.failed("(Critical) Connection with Azure failed with cause:\n"+e.getMessage());
         }
         return false;
     }
@@ -74,9 +81,21 @@ public class AzureConnector {
         try {
             CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
             return blob.downloadText();
-        } catch (URISyntaxException | IOException | StorageException e) {
+        } catch (StorageException e) {
+            observer.failed("(Critical) Cannot download trigger("+e.getMessage()+")");
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+    public void deleteTrigger(){
+        try {
+            CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
+            if(!blob.deleteIfExists())
+                observer.failed("(Azure) Cannot delete trigger(does'nt exist)");
+        } catch (URISyntaxException | StorageException e) {
+            e.printStackTrace();
+        }
+
     }
 }

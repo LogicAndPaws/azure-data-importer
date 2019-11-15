@@ -17,8 +17,6 @@ public class AzureDataImporterApplication {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(AzureDataImporterApplication.class, args);
 		MainLine line = (MainLine) applicationContext.getBean("mainline");
 		line.startImport();
-//		ApplicationConfig config = (ApplicationConfig)applicationContext.getBean("config");
-//		System.out.println(config.createConfigFile().getAbsolutePath());
 	}
 
 }
