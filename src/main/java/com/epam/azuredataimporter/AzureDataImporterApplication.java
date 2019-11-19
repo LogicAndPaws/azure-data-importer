@@ -2,6 +2,8 @@ package com.epam.azuredataimporter;
 
 import com.epam.azuredataimporter.config.ApplicationConfig;
 import com.epam.azuredataimporter.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -12,11 +14,17 @@ import java.util.List;
 
 @SpringBootApplication
 @ComponentScan("com.epam.azuredataimporter.config")
-public class AzureDataImporterApplication {
+public class AzureDataImporterApplication implements CommandLineRunner {
+
+	@Autowired
+	private MainLine mainLine;
+
 	public static void main(String[] args) {
-		ConfigurableApplicationContext applicationContext = SpringApplication.run(AzureDataImporterApplication.class, args);
-		MainLine line = (MainLine) applicationContext.getBean("mainline");
-		line.startImport();
+		SpringApplication.run(AzureDataImporterApplication.class, args);
 	}
 
+	@Override
+	public void run(String... args) throws Exception {
+		mainLine.startImport();
+	}
 }

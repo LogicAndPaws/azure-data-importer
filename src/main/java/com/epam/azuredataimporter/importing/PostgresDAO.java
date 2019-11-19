@@ -1,4 +1,4 @@
-package com.epam.azuredataimporter.dao;
+package com.epam.azuredataimporter.importing;
 
 import com.epam.azuredataimporter.ResultsObserver;
 import com.epam.azuredataimporter.entity.User;
@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostgresDAO {
+public class PostgresDAO implements DaoImporter<User>{
     private JdbcTemplate template = null;
     private final static String driver = "org.postgresql.Driver";
 //    private String url;
@@ -52,15 +52,18 @@ public class PostgresDAO {
         User user = template.query("SELECT * FROM users WHERE id= ?",userExtractor,id);
         return user;
     }
-    public void insertUser(User user){
+
+    public List<User> getUsers(){
+        return template.query("SELECT * FROM users",userListExtractor);
+    }
+
+    @Override
+    public void insertObject(User user) {
         if(getUserById(user.getId())!=null){
             observer.failed("(DataBase) User with id("+user.getId()+") already exist");
             return;
         }
         template.update("INSERT INTO users values(?, ?, ?)",user.getId(),user.getName(),user.getPassword());
         observer.success();
-    }
-    public List<User> getUsers(){
-        return template.query("SELECT * FROM users",userListExtractor);
     }
 }

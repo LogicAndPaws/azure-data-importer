@@ -1,11 +1,11 @@
-package com.epam.azuredataimporter.data;
+package com.epam.azuredataimporter.validation;
 
 import com.epam.azuredataimporter.ResultsObserver;
 import com.epam.azuredataimporter.entity.User;
 
-public class DataValidator {
+public class UserValidator implements ObjectValidator<User>{
     private ResultsObserver observer;
-    public DataValidator(ResultsObserver observer){
+    public UserValidator(ResultsObserver observer){
         this.observer = observer;
     }
     private boolean validateId(User user){
@@ -29,7 +29,9 @@ public class DataValidator {
         }
         return true;
     }
-    public boolean validUser(User user){
+
+    @Override
+    public boolean isValid(User user) {
         return validateId(user) & validateName(user) & validatePassword(user);
     }
 }

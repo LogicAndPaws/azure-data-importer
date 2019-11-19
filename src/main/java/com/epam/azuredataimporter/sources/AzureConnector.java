@@ -1,4 +1,4 @@
-package com.epam.azuredataimporter.azure;
+package com.epam.azuredataimporter.sources;
 
 
 import com.epam.azuredataimporter.ResultsObserver;
@@ -11,12 +11,12 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
-public class AzureConnector {
+public class AzureConnector implements FileSource, TriggerSource {
     private final String storageConnectionString = "UseDevelopmentStorage=true;";
     private CloudBlobContainer container=null;
     private ResultsObserver observer;
     private String triggerFilename;
-    public AzureConnector(ResultsObserver observer,String blobName,String triggerFilename){
+    public AzureConnector(ResultsObserver observer, String blobName, String triggerFilename){
         this.observer = observer;
         this.triggerFilename = triggerFilename;
         try {
@@ -29,6 +29,7 @@ public class AzureConnector {
         }
     }
 
+    @Override
     public File readFile(String filename) {
         try {
             File file = new File(filename);
@@ -40,22 +41,7 @@ public class AzureConnector {
             return null;
         }
     }
-//    public BufferedReader openReadStream(String filename){
-//        try {
-//            CloudBlockBlob blob = container.getBlockBlobReference(filename);
-//            BlobInputStream blobInputStream = blob.openInputStream();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(blobInputStream));
-//            System.out.println(reader.ready());
-//            System.out.println(reader.readLine());
-//            System.out.println(reader.readLine());
-//            return reader;
-////            return new BufferedReader(new InputStreamReader(blobInputStream));
-//        } catch (StorageException | URISyntaxException | IOException e) {
-//            e.printStackTrace();
-//            observer.failed("(Critical) Connection with Azure failed with cause:\n"+e.getMessage());
-//            return null;
-//        }
-//    }
+    @Override
     public boolean sendFile(File file){
         try{
             CloudBlockBlob blob = container.getBlockBlobReference(file.getName());
@@ -66,6 +52,7 @@ public class AzureConnector {
         }
         return false;
     }
+    @Override
     public boolean sendStringToFile(String stringLine, String filename){
         try {
             CloudBlockBlob blob = container.getBlockBlobReference(filename);
@@ -77,6 +64,7 @@ public class AzureConnector {
         }
         return false;
     }
+    @Override
     public String getTrigger(){
         try {
             CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
@@ -88,6 +76,7 @@ public class AzureConnector {
         }
         return null;
     }
+    @Override
     public void deleteTrigger(){
         try {
             CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
