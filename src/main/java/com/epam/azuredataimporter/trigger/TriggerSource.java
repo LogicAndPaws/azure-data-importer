@@ -1,4 +1,4 @@
-package com.epam.azuredataimporter.sources;
+package com.epam.azuredataimporter.trigger;
 
 public interface TriggerSource {
     String getTrigger();

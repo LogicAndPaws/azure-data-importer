@@ -1,6 +1,7 @@
 package com.epam.azuredataimporter.spliting;
 
 import com.epam.azuredataimporter.ServiceStatus;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+@Component
 public class FileLineReaderService implements LineReaderService {
 
     ServiceStatus status = ServiceStatus.Ready;
@@ -17,23 +19,22 @@ public class FileLineReaderService implements LineReaderService {
     private Queue<String> linesQueue;
     private int maxQueue = 500;
 
-    public FileLineReaderService(){}
-
-    public FileLineReaderService(int maxQueue){
-        this.maxQueue = maxQueue;
-    }
-
+    //TODO replace to something better than Runnable
     private Runnable startRead = new Runnable() {
         @Override
         public void run() {
-            while(true){
-                try{
-                    while(linesQueue.size()>=maxQueue-1)Thread.sleep(20);
-                    if(reader.ready())
-                    linesQueue.offer(reader.readLine());
-                    else break;
+            while (true) {
+                try {
+                    while (linesQueue.size() >= maxQueue - 1) Thread.sleep(20);
+                    if (reader.ready())
+                        linesQueue.offer(reader.readLine());
+                    else {
+                        reader.close();
+                        break;
+                    }
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt();
                     break;
                 }
             }
@@ -41,15 +42,15 @@ public class FileLineReaderService implements LineReaderService {
         }
     };
 
-    private void start(){
+    private void start() {
         status = ServiceStatus.Working;
-        new Thread(startRead,"ImportThread").start();
+        new Thread(startRead, "ImportThread").start();
     }
 
     @Override
     public Queue<String> splitStream(InputStream stream) throws Exception {
-        if(status == ServiceStatus.Working)throw new Exception("Service is busy yet");
-        if(stream == null)throw new NullPointerException("Input stream is NULL");
+        if (status == ServiceStatus.Working) throw new Exception("Service is busy yet");
+        if (stream == null) throw new NullPointerException("Input stream is NULL");
         reader = new BufferedReader(new InputStreamReader(stream));
         linesQueue = new ArrayBlockingQueue<>(maxQueue);
         start();
@@ -57,7 +58,7 @@ public class FileLineReaderService implements LineReaderService {
     }
 
     @Override
-    public ServiceStatus getStatus() {
-        return status;
+    public boolean isDone() {
+        return status == ServiceStatus.Done;
     }
 }

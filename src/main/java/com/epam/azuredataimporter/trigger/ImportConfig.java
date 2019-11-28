@@ -1,4 +1,4 @@
-package com.epam.azuredataimporter;
+package com.epam.azuredataimporter.trigger;
 
 public class ImportConfig {
     public String targetFile;
