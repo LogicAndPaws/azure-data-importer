@@ -4,7 +4,6 @@ package com.epam.azuredataimporter.sources;
 import com.epam.azuredataimporter.config.ApplicationConfig;
 import com.epam.azuredataimporter.reporting.ReportSender;
 import com.epam.azuredataimporter.reporting.ResultsObserver;
-import com.epam.azuredataimporter.trigger.TriggerSource;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.OperationContext;
 import com.microsoft.azure.storage.StorageException;
@@ -18,7 +17,7 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
 @Component
-public class AzureConnector implements FileSource, TriggerSource, ReportSender {
+public class AzureConnector implements FileSource, ReportSender {
     private final String storageConnectionString = "UseDevelopmentStorage=true;";
     private CloudBlobContainer container = null;
     @Autowired
@@ -49,32 +48,6 @@ public class AzureConnector implements FileSource, TriggerSource, ReportSender {
             e.printStackTrace();
             return null;
         }
-    }
-
-    ////////////////////////TriggerSource/////////////////////
-    @Override
-    public String getTrigger() {
-        try {
-            CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
-            return blob.downloadText();
-        } catch (StorageException e) {
-            observer.failed("(Critical) Cannot download trigger(" + e.getMessage() + ")");
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public void deleteTrigger() {
-        try {
-            CloudBlockBlob blob = container.getBlockBlobReference(triggerFilename);
-            if (!blob.deleteIfExists())
-                observer.failed("(Azure) Cannot delete trigger(does'nt exist)");
-        } catch (URISyntaxException | StorageException e) {
-            e.printStackTrace();
-        }
-
     }
 
     ////////////////////////ReportSender/////////////////////

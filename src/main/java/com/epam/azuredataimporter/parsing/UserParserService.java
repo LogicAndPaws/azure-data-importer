@@ -33,7 +33,7 @@ public class UserParserService implements ParseService<User> {
                     if (stringsQueue.isEmpty()) {
                         continue;
                     }
-                    User nextUser = parser.parse(stringsQueue.remove());
+                    User nextUser = parser.parse(stringsQueue.remove(), User.class);
                     if (nextUser == null) continue;
                     while (!resultsQueue.offer(nextUser)) Thread.sleep(10);
                 } catch (InterruptedException e) {

@@ -1,6 +1,6 @@
 package com.epam.azuredataimporter.entity;
 
-public class User {
+public class User implements Entity {
     private final int id;
     private final String name;
     private final String password;

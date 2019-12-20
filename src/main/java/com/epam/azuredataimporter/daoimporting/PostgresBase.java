@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class PostgresBase implements BaseImporter<User> {
+public class PostgresBase<T> implements BaseImporter<T> {
     private JdbcTemplate template = null;
     @Autowired
     private ResultsObserver observer;
@@ -49,7 +49,6 @@ public class PostgresBase implements BaseImporter<User> {
         return template.query("SELECT * FROM users", userListExtractor);
     }
 
-    @Override
     public void insertObject(User user) {
         if (getUserById(user.getId()) != null) {
             observer.failed("(DataBase) User with id(" + user.getId() + ") already exist");
@@ -57,5 +56,11 @@ public class PostgresBase implements BaseImporter<User> {
         }
         template.update("INSERT INTO users values(?, ?, ?)", user.getId(), user.getName(), user.getPassword());
         observer.success();
+    }
+
+
+    @Override
+    public void insertObject(T object) {
+
     }
 }

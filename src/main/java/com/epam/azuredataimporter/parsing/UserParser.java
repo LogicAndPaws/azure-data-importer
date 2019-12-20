@@ -11,7 +11,7 @@ public class UserParser implements ObjectParser<User> {
     private ResultsObserver observer;
 
     @Override
-    public User parse(String line) {
+    public User parse(String line, Class<User> userClass) {
         String[] fields = line.split(",");
         if (fields.length != 3) {
             observer.failed("(Parse) Wrong line format around " + fields[0]);
