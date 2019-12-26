@@ -24,7 +24,7 @@ public class ApplicationEndpoint {
         sequence.addPare(companyCsv, Company.class);
         sequence.addPare(modelCsv, Model.class);
         sequence.addPare(phoneCsv, Phone.class);
-        printConfig(sequence);
+        importService.startImport(sequence);
     }
 
     @GetMapping("/import")
@@ -35,13 +35,7 @@ public class ApplicationEndpoint {
         sequence.addPare("company.csv", Company.class);
         sequence.addPare("model.csv", Model.class);
         sequence.addPare("phone.csv", Phone.class);
-        printConfig(sequence);
+        importService.startImport(sequence);
     }
 
-    private void printConfig(ImportSequence sequence) {
-        while (sequence.hasNext()) {
-            ImportConfig config = sequence.getNext();
-            System.out.println(config.getClazz() + " : " + config.getCsv());
-        }
-    }
 }

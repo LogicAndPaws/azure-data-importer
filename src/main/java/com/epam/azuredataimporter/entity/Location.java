@@ -1,5 +1,8 @@
 package com.epam.azuredataimporter.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Location implements Entity {
     String name;
     String address;
@@ -22,5 +25,24 @@ public class Location implements Entity {
 
     public int getManagerId() {
         return managerId;
+    }
+
+    @Override
+    public String getUniqueId() {
+        return name;
+    }
+
+    @Override
+    public List<Object> getFields() {
+        List<Object> values = new ArrayList<>();
+        values.add(name);
+        values.add(address);
+        values.add(managerId);
+        return values;
+    }
+
+    @Override
+    public String getTableName() {
+        return "location";
     }
 }

@@ -1,7 +1,7 @@
 package com.epam.azuredataimporter.parsing;
 
 import com.epam.azuredataimporter.ServiceStatus;
-import com.epam.azuredataimporter.entity.User;
+import com.epam.azuredataimporter.entity.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,10 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 @Component
-public class UserParserService implements ParseService<User> {
+public class UniversalParserService<T extends Entity> implements ParseService<T> {
     @Autowired
-    private ObjectParser<User> parser;
+    private ObjectParser<T> parser;
+    private Class<T> clazz;
 
     private Thread[] threads;
     private int maxThreads = 1;
@@ -19,7 +20,7 @@ public class UserParserService implements ParseService<User> {
     private ServiceStatus status = ServiceStatus.Ready;
 
     private Queue<String> stringsQueue;
-    private Queue<User> resultsQueue;
+    private Queue<T> resultsQueue;
     private boolean endOfQueue = false;
 
     //TODO replace to something better than Runnable
@@ -33,9 +34,10 @@ public class UserParserService implements ParseService<User> {
                     if (stringsQueue.isEmpty()) {
                         continue;
                     }
-                    User nextUser = parser.parse(stringsQueue.remove(), User.class);
-                    if (nextUser == null) continue;
-                    while (!resultsQueue.offer(nextUser)) Thread.sleep(10);
+                    T nextEntity = parser.parse(stringsQueue.remove(), clazz);
+//                    System.out.println(nextEntity.getUniqueId());
+                    if (nextEntity == null) continue;
+                    while (!resultsQueue.offer(nextEntity)) Thread.sleep(10);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -44,14 +46,6 @@ public class UserParserService implements ParseService<User> {
             checkDone();
         }
     };
-
-    public UserParserService() {
-    }
-
-    public UserParserService(int maxThreads, int maxQueue) {
-        this.maxThreads = maxThreads;
-        this.maxQueue = maxQueue;
-    }
 
     private void start() {
         status = ServiceStatus.Working;
@@ -70,12 +64,13 @@ public class UserParserService implements ParseService<User> {
     }
 
     @Override
-    public Queue<User> startAsyncParse(Queue<String> lines) throws Exception {
+    public Queue<T> startAsyncParse(Queue<String> lines, Class<T> clazz) throws Exception {
         if (status == ServiceStatus.Working) throw new Exception("Service is busy yet");
         if (lines == null) throw new NullPointerException("Input queue is NULL");
         stringsQueue = lines;
         resultsQueue = new ArrayBlockingQueue<>(maxQueue);
         endOfQueue = false;
+        this.clazz = clazz;
         start();
         return resultsQueue;
     }

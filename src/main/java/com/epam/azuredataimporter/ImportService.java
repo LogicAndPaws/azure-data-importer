@@ -1,6 +1,7 @@
 package com.epam.azuredataimporter;
 
 import com.epam.azuredataimporter.daoimporting.BaseImportService;
+import com.epam.azuredataimporter.entity.Entity;
 import com.epam.azuredataimporter.parsing.ParseService;
 import com.epam.azuredataimporter.reporting.ReportService;
 import com.epam.azuredataimporter.reporting.ResultsObserver;
@@ -12,23 +13,24 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Queue;
 
 @Component
-public class ImportService {
+public class ImportService<T extends Entity> {
     //////////////////////////////Services/////////////////////////////////
     @Autowired
     private FileSource sourceService;
     @Autowired
     private LineReaderService splitService;
     @Autowired
-    private ParseService parseService;
+    private ParseService<T> parseService;
     @Autowired
-    private ValidationService validationService;
+    private ValidationService<T> validationService;
     @Autowired
-    private BaseImportService baseImportService;
+    private BaseImportService<T> baseImportService;
     @Autowired
     private ReportService reportService;
     @Autowired
@@ -45,16 +47,16 @@ public class ImportService {
     public void startImport(ImportSequence importSequence) {
         while (importSequence.hasNext()) {
             ImportConfig config = importSequence.getNext();
+            System.out.println("Importing " + config.getCsv() + "...");
             File sourceFile = sourceService.readFile(config.getCsv());
             if (sourceFile == null) {
                 endImporting();
                 return;
             }
             try {
-
                 Queue<String> linesQueue = splitService.splitStream(new FileInputStream(sourceFile));
-                Queue validationQueue = parseService.startAsyncParse(linesQueue);
-                Queue baseImportQueue = validationService.startAsyncValidation(validationQueue);
+                Queue<T> validationQueue = parseService.startAsyncParse(linesQueue, config.getClazz());
+                Queue<T> baseImportQueue = validationService.startAsyncValidation(validationQueue);
                 baseImportService.startAsyncImport(baseImportQueue);
                 boolean splitDone = false;
                 boolean parseDone = false;
@@ -63,7 +65,7 @@ public class ImportService {
                     if (!splitDone && splitService.isDone()) {
                         parseService.endAsyncParse();
                         splitDone = true;
-                        sourceFile.delete();
+                        Files.delete(sourceFile.toPath());
                         System.out.println("(Split) Done");
                     }
                     if (!parseDone && parseService.isDone()) {
@@ -84,7 +86,8 @@ public class ImportService {
                 e.printStackTrace();
                 observer.failed("(Critical) Internal error");
             }
-            endImporting();
         }
+        endImporting();
+        System.out.println("Import complete!");
     }
 }

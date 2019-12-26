@@ -1,10 +1,12 @@
-package com.epam.azuredataimporter.validation;
+package com.epam.azuredataimporter.entityValidator;
 
 import com.epam.azuredataimporter.entity.Worker;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+@Service
 public class WorkerValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {

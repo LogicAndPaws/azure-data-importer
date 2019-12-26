@@ -16,7 +16,7 @@ public class AzureDataImporterApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(AzureDataImporterApplication.class);
-//        app.run(args);
+        app.run(args);
     }
 
     @Override

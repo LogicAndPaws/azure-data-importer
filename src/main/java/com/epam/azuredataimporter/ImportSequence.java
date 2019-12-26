@@ -5,17 +5,17 @@ import com.epam.azuredataimporter.entity.Entity;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ImportSequence {
+public class ImportSequence<T extends Entity> {
     private Queue<String> csvSequence = new LinkedList<>();
-    private Queue<Class<? extends Entity>> classesSequence = new LinkedList<>();
+    private Queue<Class<T>> classesSequence = new LinkedList<>();
 
-    public void addPare(String csv, Class<? extends Entity> clazz) {
+    public void addPare(String csv, Class<T> clazz) {
         csvSequence.add(csv);
         classesSequence.add(clazz);
     }
 
-    public ImportConfig getNext() {
-        return new ImportConfig(csvSequence.remove(), classesSequence.remove());
+    public ImportConfig<T> getNext() {
+        return new ImportConfig<>(csvSequence.remove(), classesSequence.remove());
     }
 
     public boolean hasNext() {

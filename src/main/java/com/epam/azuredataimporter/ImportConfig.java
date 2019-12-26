@@ -3,11 +3,11 @@ package com.epam.azuredataimporter;
 
 import com.epam.azuredataimporter.entity.Entity;
 
-public class ImportConfig {
+public class ImportConfig<T extends Entity> {
     private String csv;
-    private Class<? extends Entity> clazz;
+    private Class<T> clazz;
 
-    public ImportConfig(String csv, Class<? extends Entity> clazz) {
+    public ImportConfig(String csv, Class<T> clazz) {
         this.csv = csv;
         this.clazz = clazz;
     }
@@ -16,7 +16,7 @@ public class ImportConfig {
         return csv;
     }
 
-    public Class<? extends Entity> getClazz() {
+    public Class<T> getClazz() {
         return clazz;
     }
 }

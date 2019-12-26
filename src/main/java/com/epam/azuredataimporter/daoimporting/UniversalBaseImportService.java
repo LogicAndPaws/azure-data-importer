@@ -1,7 +1,7 @@
 package com.epam.azuredataimporter.daoimporting;
 
 import com.epam.azuredataimporter.ServiceStatus;
-import com.epam.azuredataimporter.entity.User;
+import com.epam.azuredataimporter.entity.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,30 +9,29 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 @Component
-public class UserBaseImportService implements BaseImportService<User> {
+public class UniversalBaseImportService<T extends Entity> implements BaseImportService<T> {
     @Autowired
-    private BaseImporter<User> importer;
+    private BaseImporter<T> importer;
 
     private Thread[] threads;
-    private int maxThreads = 20;
+    private int maxThreads = 1;
     private ServiceStatus status = ServiceStatus.Ready;
 
-    private Queue<User> usersQueue;
+    private Queue<T> entityQueue;
     private boolean endOfQueue = false;
 
-    //TODO replace to something better than Runnable
     private Runnable startImport = new Runnable() {
         @Override
         public void run() {
             while (true) {
                 try {
-                    if (usersQueue.isEmpty() && endOfQueue) break;
-                    if (usersQueue.isEmpty()) {
+                    if (entityQueue.isEmpty() && endOfQueue) break;
+                    if (entityQueue.isEmpty()) {
                         Thread.sleep(20);
                         continue;
                     }
                     try {
-                        importer.insertObject(usersQueue.remove());
+                        importer.insertObject(entityQueue.remove());
                     } catch (NoSuchElementException ignore) {
                     }
                 } catch (InterruptedException e) {
@@ -43,13 +42,6 @@ public class UserBaseImportService implements BaseImportService<User> {
             checkDone();
         }
     };
-
-    public UserBaseImportService() {
-    }
-
-    public UserBaseImportService(int maxThreads) {
-        this.maxThreads = maxThreads;
-    }
 
     private void start() {
         status = ServiceStatus.Working;
@@ -73,10 +65,10 @@ public class UserBaseImportService implements BaseImportService<User> {
     }
 
     @Override
-    public void startAsyncImport(Queue<User> queue) throws Exception {
+    public void startAsyncImport(Queue<T> queue) throws Exception {
         if (status == ServiceStatus.Working) throw new Exception("Service is busy yet");
         if (queue == null) throw new NullPointerException("Input queue is NULL");
-        usersQueue = queue;
+        entityQueue = queue;
         endOfQueue = false;
         start();
     }
@@ -90,5 +82,4 @@ public class UserBaseImportService implements BaseImportService<User> {
     public boolean isDone() {
         return status == ServiceStatus.Done;
     }
-
 }
