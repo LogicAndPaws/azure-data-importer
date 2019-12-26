@@ -1,0 +1,126 @@
+databaseChangeLog:
+
+  #  - preConditions:
+  #      - onFail: CONTINUE
+  #      - not:
+  #          - tableExists:
+  #              tableName: worker
+
+  - changeSet:
+      id: 1
+      author: SunShade
+      changes:
+        - createTable:
+            tableName: worker
+            columns:
+              - column:
+                  name: worker_id
+                  type: int
+                  constraints:
+                    unique: true
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar
+              - column:
+                  name: phone_number
+                  type: varchar
+
+  - changeSet:
+      id: 2
+      author: SunShade
+      changes:
+        - createTable:
+            tableName: location
+            columns:
+              - column:
+                  name: location_name
+                  type: varchar
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: location_address
+                  type: varchar
+              - column:
+                  name: manager
+                  type: int
+                  constraints:
+                    references: worker
+                    foreignKeyName: worker_id
+
+  - changeSet:
+      id: 3
+      author: SunShade
+      changes:
+        - createTable:
+            tableName: company
+            columns:
+              - column:
+                  name: company_name
+                  type: varchar
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: manager_phone_number
+                  type: varchar
+
+  - changeSet:
+      id: 4
+      author: SunShade
+      changes:
+        - createTable:
+            tableName: model
+            columns:
+              - column:
+                  name: model_name
+                  type: varchar
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: company
+                  type: varchar
+                  constraints:
+                    references: company
+                    foreignKeyName: company_name
+
+  - changeSet:
+      id: 5
+      author: SunShade
+      changes:
+        - createTable:
+            tableName: phone
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: model
+                  type: varchar
+                  constraints:
+                    references: model
+                    foreignKeyName: model_name
+              - column:
+                  name: company
+                  type: varchar
+                  constraints:
+                    references: company
+                    foreignKeyName: company_name
+              - column:
+                  name: location
+                  type: varchar
+                  constraints:
+                    references: location
+                    foreignKeyName: location_name
+              - column:
+                  name: cost
+                  type: numeric(10,2)

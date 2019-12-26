@@ -1,7 +1,7 @@
-package com.epam.azuredataimporter.validation;
+package com.epam.azuredataimporter.parsing;
 
 import com.epam.azuredataimporter.ServiceStatus;
-import com.epam.azuredataimporter.entity.User;
+import com.epam.azuredataimporter.entity.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,33 +9,35 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 @Component
-public class UserValidationService implements ValidationService<User> {
+public class UniversalParserService<T extends Entity> implements ParseService<T> {
     @Autowired
-    private ObjectValidator<User> validator;
+    private ObjectParser<T> parser;
+    private Class<T> clazz;
 
     private Thread[] threads;
     private int maxThreads = 1;
     private int maxQueue = 500;
     private ServiceStatus status = ServiceStatus.Ready;
 
-    private Queue<User> usersQueue;
-    private Queue<User> resultsQueue;
+    private Queue<String> stringsQueue;
+    private Queue<T> resultsQueue;
     private boolean endOfQueue = false;
 
     //TODO replace to something better than Runnable
-    private Runnable startValidation = new Runnable() {
+    private Runnable startParse = new Runnable() {
         @Override
         public void run() {
             while (true) {
                 try {
-                    if (usersQueue.isEmpty() && endOfQueue)
+                    if (stringsQueue.isEmpty() && endOfQueue)
                         break;
-                    if (usersQueue.isEmpty()) {
+                    if (stringsQueue.isEmpty()) {
                         continue;
                     }
-                    User nextUser = usersQueue.remove();
-                    if (!validator.isValid(nextUser)) continue;
-                    while (!resultsQueue.offer(nextUser)) Thread.sleep(20);
+                    T nextEntity = parser.parse(stringsQueue.remove(), clazz);
+//                    System.out.println(nextEntity.getUniqueId());
+                    if (nextEntity == null) continue;
+                    while (!resultsQueue.offer(nextEntity)) Thread.sleep(10);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -49,8 +51,8 @@ public class UserValidationService implements ValidationService<User> {
         status = ServiceStatus.Working;
         threads = new Thread[maxThreads];
         for (int i = 0; i < maxThreads; i++) {
-            threads[i] = new Thread(startValidation);
-            threads[i].setName("ValidatorThread" + i);
+            threads[i] = new Thread(startParse);
+            threads[i].setName("ParserThread" + i);
             threads[i].start();
         }
     }
@@ -62,20 +64,19 @@ public class UserValidationService implements ValidationService<User> {
     }
 
     @Override
-    public Queue<User> startAsyncValidation(Queue<User> queue) throws Exception {
+    public Queue<T> startAsyncParse(Queue<String> lines, Class<T> clazz) throws Exception {
         if (status == ServiceStatus.Working) throw new Exception("Service is busy yet");
-        if (queue == null) {
-            throw new NullPointerException("Input queue is NULL");
-        }
-        usersQueue = queue;
+        if (lines == null) throw new NullPointerException("Input queue is NULL");
+        stringsQueue = lines;
         resultsQueue = new ArrayBlockingQueue<>(maxQueue);
         endOfQueue = false;
+        this.clazz = clazz;
         start();
         return resultsQueue;
     }
 
     @Override
-    public void endAsyncValidation() {
+    public void endAsyncParse() {
         endOfQueue = true;
     }
 
