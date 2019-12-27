@@ -14,7 +14,7 @@ public class UniversalBaseImportService<T extends Entity> implements BaseImportS
     private BaseImporter<T> importer;
 
     private Thread[] threads;
-    private int maxThreads = 1;
+    private int maxThreads = 10;
     private ServiceStatus status = ServiceStatus.Ready;
 
     private Queue<T> entityQueue;

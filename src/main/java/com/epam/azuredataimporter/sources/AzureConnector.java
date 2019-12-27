@@ -44,10 +44,12 @@ public class AzureConnector implements FileSource, ReportSender {
             CloudBlockBlob blob = container.getBlockBlobReference(filename);
             blob.downloadToFile(file.getAbsolutePath());
             return file;
-        } catch (StorageException | URISyntaxException | IOException e) {
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
-            return null;
+        } catch (StorageException e) {
+            observer.failed("(Azure) Error with " + filename + ": " + e.getMessage());
         }
+        return null;
     }
 
     ////////////////////////ReportSender/////////////////////

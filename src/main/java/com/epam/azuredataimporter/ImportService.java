@@ -50,6 +50,7 @@ public class ImportService<T extends Entity> {
             System.out.println("Importing " + config.getCsv() + "...");
             File sourceFile = sourceService.readFile(config.getCsv());
             if (sourceFile == null) {
+                System.out.println("Critical error! Import's ended");
                 endImporting();
                 return;
             }
