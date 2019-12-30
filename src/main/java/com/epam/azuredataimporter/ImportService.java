@@ -40,7 +40,7 @@ public class ImportService<T extends Entity> {
     private void endImporting() {
         String reportName = LocalTime.now().toString().split("[.]")[0].replace(':', '-') +
                 "_" + LocalDate.now().toString().replace('-', '.') + "_importReport.txt";
-        if (!reportService.sendReport(reportName)) reportService.writeReport(new File(reportName));
+        reportService.sendReport(reportName);
         reportService.resetLog();
     }
 
@@ -48,6 +48,7 @@ public class ImportService<T extends Entity> {
         while (importSequence.hasNext()) {
             ImportConfig config = importSequence.getNext();
             System.out.println("Importing " + config.getCsv() + "...");
+            observer.changeFile(config.getCsv());
             File sourceFile = sourceService.readFile(config.getCsv());
             if (sourceFile == null) {
                 System.out.println("Critical error! Import's ended");

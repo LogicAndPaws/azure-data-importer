@@ -73,7 +73,7 @@ public class AzureConnector implements FileSource, ReportSender {
             return true;
         } catch (URISyntaxException | StorageException | IOException e) {
             e.printStackTrace();
-            observer.failed("(Critical) Connection with Azure failed with cause:\n" + e.getMessage());
+            observer.failed("(Azure) Connection with Azure failed with cause:\n" + e.getMessage());
         }
         return false;
     }

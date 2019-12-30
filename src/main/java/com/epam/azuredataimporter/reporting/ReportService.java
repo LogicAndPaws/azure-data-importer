@@ -3,9 +3,7 @@ package com.epam.azuredataimporter.reporting;
 import java.io.File;
 
 public interface ReportService {
-    String getReport();
-
-    File writeReport(File filename);
+    File getReport();
 
     boolean sendReport(String reportName);
 

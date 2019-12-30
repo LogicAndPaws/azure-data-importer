@@ -3,7 +3,7 @@ package com.epam.azuredataimporter.reporting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
 
 @Component
 public class DefaultReportService implements ReportService {
@@ -13,24 +13,13 @@ public class DefaultReportService implements ReportService {
     private ReportSender sender;
 
     @Override
-    public String getReport() {
-        return reporter.getReport();
-    }
-
-    @Override
-    public File writeReport(File file) {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
-            writer.write(getReport());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return file;
+    public File getReport() {
+        return reporter.getReportFile();
     }
 
     @Override
     public boolean sendReport(String reportName) {
-        return sender.sendReport(reporter.getReport(), reportName);
+        return sender.sendReport(reporter.getReportFile());
     }
 
     @Override
