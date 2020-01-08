@@ -19,7 +19,7 @@ public class FileLineReaderService implements LineReaderService {
     private Queue<String> linesQueue;
     private int maxQueue = 500;
 
-    //TODO replace to something better than Runnable
+    //TODO replace to something better then Runnable
     private Runnable startRead = new Runnable() {
         @Override
         public void run() {

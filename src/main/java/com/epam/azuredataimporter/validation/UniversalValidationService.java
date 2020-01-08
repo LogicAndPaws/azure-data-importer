@@ -22,7 +22,7 @@ public class UniversalValidationService<T extends Entity> implements ValidationS
     private Queue<T> resultsQueue;
     private boolean endOfQueue = false;
 
-    //TODO replace to something better than Runnable
+    //TODO replace to something better then Runnable
     private Runnable startValidation = new Runnable() {
         @Override
         public void run() {

@@ -23,7 +23,7 @@ public class UniversalParserService<T extends Entity> implements ParseService<T>
     private Queue<T> resultsQueue;
     private boolean endOfQueue = false;
 
-    //TODO replace to something better than Runnable
+    //TODO replace to something better then Runnable
     private Runnable startParse = new Runnable() {
         @Override
         public void run() {
@@ -35,7 +35,6 @@ public class UniversalParserService<T extends Entity> implements ParseService<T>
                         continue;
                     }
                     T nextEntity = parser.parse(stringsQueue.remove(), clazz);
-//                    System.out.println(nextEntity.getUniqueId());
                     if (nextEntity == null) continue;
                     while (!resultsQueue.offer(nextEntity)) Thread.sleep(10);
                 } catch (InterruptedException e) {
