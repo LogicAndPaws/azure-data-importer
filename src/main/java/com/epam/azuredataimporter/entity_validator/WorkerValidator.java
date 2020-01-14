@@ -19,7 +19,7 @@ public class WorkerValidator implements Validator {
         if (worker.getId() < 10000000 || worker.getId() > 99999999) {
             errors.rejectValue("id", "", "wrong id format");
         }
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "", "id can't be empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "", "name can't be empty");
         if (!worker.getName().matches("(\\w{3,} |\\w{3,}){2,3}|\\w{3,} (\\w\\.|\\w\\. ){1,2}")) {
             errors.rejectValue("name", "", "Wrong name format");
         }

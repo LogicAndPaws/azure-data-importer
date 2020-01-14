@@ -18,8 +18,5 @@ public class ApplicationConfig {
     @Getter
     @Value("${azure.blobName}")
     private String blobName;
-    @Getter
-    @Value("${azure.importTrigger}")
-    private String importTrigger;
 
 }

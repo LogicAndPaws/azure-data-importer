@@ -17,7 +17,7 @@ public class CompanyValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Company company = (Company) target;
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "companyName", "", "Company name can't be empty");
-        if (!company.getManagerPhoneNumber().matches("")) {
+        if (!company.getManagerPhoneNumber().matches("\\+?\\d{7,20}")) {
             errors.rejectValue("managerPhoneNumber", "", "Manager number has wrong format");
         }
     }

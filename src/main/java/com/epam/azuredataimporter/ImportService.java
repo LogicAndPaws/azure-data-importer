@@ -68,22 +68,18 @@ public class ImportService<T extends Entity> {
                         parseService.endAsyncParse();
                         splitDone = true;
                         Files.delete(sourceFile.toPath());
-                        System.out.println("(Split) Done");
                     }
                     if (!parseDone && parseService.isDone()) {
                         validationService.endAsyncValidation();
                         parseDone = true;
-                        System.out.println("(Parse) Done");
                     }
                     if (!validationDone && validationService.isDone()) {
                         baseImportService.endAsyncImport();
                         validationDone = true;
-                        System.out.println("(Validation) Done");
                     }
                     if (baseImportService.isDone()) break;
                     Thread.sleep(1000);
                 }
-                System.out.println("(Import) Done");
             } catch (Exception e) {
                 e.printStackTrace();
                 observer.failed("(Critical) Internal error");
