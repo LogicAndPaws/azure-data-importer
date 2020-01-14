@@ -28,7 +28,6 @@ public class Reporter implements ResultsObserver {
             if (reportFile.exists()) {
                 Files.delete(reportFile.toPath());
             }
-            reportFile.createNewFile();
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile)));
             startTime = LocalTime.now();
             writeHead();
@@ -92,7 +91,10 @@ public class Reporter implements ResultsObserver {
                 writer.newLine();
             } else {
                 for (String fail : fails) {
-                    writer.write(fail);
+                    if (fail == null)
+                        writer.write("null");
+                    else
+                        writer.write(fail);
                     writer.newLine();
                 }
             }
@@ -129,7 +131,6 @@ public class Reporter implements ResultsObserver {
             if (reportFile.exists()) {
                 Files.delete(reportFile.toPath());
             }
-            reportFile.createNewFile();
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile)));
         } catch (IOException ignore) {
         }

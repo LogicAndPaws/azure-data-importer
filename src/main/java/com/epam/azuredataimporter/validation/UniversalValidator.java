@@ -30,7 +30,7 @@ public class UniversalValidator<T extends Entity> implements ObjectValidator<T> 
                 binder.validate();
                 if (binder.getBindingResult().hasErrors()) {
                     for (ObjectError err : binder.getBindingResult().getAllErrors())
-                        observer.failed("(Validator) " + object.getUniqueId() + ": " + err.getCode());
+                        observer.failed("(Validator) " + object.getUniqueId() + ": " + err.getDefaultMessage());
                     return false;
                 } else return true;
             }

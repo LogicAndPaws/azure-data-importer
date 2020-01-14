@@ -1,7 +1,8 @@
 db:
-  dbUrl: jdbc:postgresql://host.docker.internal:5432/testbase
+  dbUrl: jdbc:postgresql://localhost:5432/testbase
   dbUser: sunshade
   dbPassword: 4141
 azure:
   blobName: testblob
-  importTrigger: import.trigger
+server:
+  port: 8888

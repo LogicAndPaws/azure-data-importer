@@ -22,10 +22,8 @@ public class AzureConnector implements FileSource, ReportSender {
     private CloudBlobContainer container = null;
     @Autowired
     private ResultsObserver observer;
-    private String triggerFilename;
 
     public AzureConnector(ApplicationConfig config) {
-        this.triggerFilename = config.getImportTrigger();
         try {
             CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
             CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
